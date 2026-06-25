@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🛰️ ATALAYA
+# ATALAYA
 
 ### Consola de Visión por Computadora y Reconocimiento Facial
 
@@ -13,30 +13,30 @@
 [![Keycloak](https://img.shields.io/badge/Keycloak-OIDC%20+%20RBAC-4D4D4D?logo=keycloak&logoColor=white)](https://www.keycloak.org/)
 [![YOLO](https://img.shields.io/badge/YOLO-GPU-00FFFF?logo=yolo&logoColor=black)](https://docs.ultralytics.com/)
 
-🌐 **[soagbct2026.mooo.com](https://soagbct2026.mooo.com)**
+**[soagbct2026.mooo.com](https://soagbct2026.mooo.com)**
 
 </div>
 
 ---
 
-## 🎯 ¿Qué es ATALAYA?
+## ¿Qué es ATALAYA?
 
 **ATALAYA** es una plataforma web que permite **subir imágenes, detectar objetos con modelos YOLO, registrar personas con su rostro e identificarlas**, todo observado en tiempo real desde un panel de control.
 
 En pocas palabras, te deja:
 
-- 🔍 **Detectar objetos** en una foto usando varios modelos YOLO.
-- 🧑‍🤝‍🧑 **Registrar personas** y su rostro en un padrón.
-- 🪪 **Reconocer caras** comparándolas contra el padrón (búsqueda por similitud vectorial).
-- 🗺️ **Ver detecciones georreferenciadas** en un mapa.
-- 📊 **Monitorear todo el sistema** (CPU, RAM, contenedores, latencias) con dashboards en vivo.
-- 🔐 **Gestionar usuarios y permisos** con login seguro y roles.
+- **Detectar objetos** en una foto usando varios modelos YOLO.
+- **Registrar personas** y su rostro en un padrón.
+- **Reconocer caras** comparándolas contra el padrón (búsqueda por similitud vectorial).
+- **Ver detecciones georreferenciadas** en un mapa.
+- **Monitorear todo el sistema** (CPU, RAM, contenedores, latencias) con dashboards en vivo.
+- **Gestionar usuarios y permisos** con login seguro y roles.
 
 Toda la plataforma corre como un conjunto de **contenedores Docker** detrás de un único dominio servido por **Nginx**.
 
 ---
 
-## 🏗️ ¿Cómo funciona? (Arquitectura)
+## ¿Cómo funciona? (Arquitectura)
 
 ```
                            Internet (HTTPS)
@@ -62,38 +62,38 @@ Toda la plataforma corre como un conjunto de **contenedores Docker** detrás de 
 
 El **frontend** (Vue) habla con **Node-RED** (el backend / API), que orquesta todo: guarda imágenes en **SeaweedFS**, persiste datos en **PostgreSQL**, valida usuarios contra **Keycloak** y delega la inferencia pesada (YOLO + rostros) a un servicio **FastAPI sobre GPU**. **Telegraf + InfluxDB + Grafana** observan el sistema completo.
 
-> 📖 Para el detalle técnico fino (modelo de datos, endpoints, flujos de seguridad) ver **[vm/arquitectura.md](vm/arquitectura.md)**.
+> Para el detalle técnico fino (modelo de datos, endpoints, flujos de seguridad) ver **[vm/arquitectura.md](vm/arquitectura.md)**.
 
 ---
 
-## 🧱 Stack tecnológico
+## Stack tecnológico
 
 | Capa | Tecnología |
 |------|------------|
-| 🔀 Proxy / TLS | Nginx + Let's Encrypt |
-| 🎨 Frontend | Vue 3 (ESM, **sin build**), Leaflet, router propio |
-| 🔐 IAM / Seguridad | Keycloak (OIDC, PKCE, RBAC) |
-| ⚙️ Backend / API | Node-RED |
-| 🖼️ Thumbnails | sharp / libvips |
-| 🗄️ Base de datos | PostgreSQL 15 + pgvector |
-| 📦 Almacenamiento | SeaweedFS |
-| 🧠 Inferencia | FastAPI + YOLO + embeddings faciales (GPU remota) |
-| 📈 Observabilidad | Telegraf + InfluxDB + Grafana (TIG) |
-| 🛠️ Admin BD | Adminer |
-| 🐳 Orquestación | Docker Compose |
+| Proxy / TLS | Nginx + Let's Encrypt |
+| Frontend | Vue 3 (ESM, **sin build**), Leaflet, router propio |
+| IAM / Seguridad | Keycloak (OIDC, PKCE, RBAC) |
+| Backend / API | Node-RED |
+| Thumbnails | sharp / libvips |
+| Base de datos | PostgreSQL 15 + pgvector |
+| Almacenamiento | SeaweedFS |
+| Inferencia | FastAPI + YOLO + embeddings faciales (GPU remota) |
+| Observabilidad | Telegraf + InfluxDB + Grafana (TIG) |
+| Admin BD | Adminer |
+| Orquestación | Docker Compose |
 
 ---
 
-## 🚀 Cómo usarlo
+## Cómo usarlo
 
 ### Requisitos previos
 
-- 🐳 **Docker** y **Docker Compose** instalados.
-- 🌍 Un dominio apuntando al servidor (o usar `localhost` para pruebas).
-- 🔒 Certificados TLS (Let's Encrypt) en `/etc/letsencrypt` — opcional en local.
-- 🧠 El servicio de inferencia **FastAPI (GPU)** corriendo y accesible (por defecto en `10.158.125.189:8000`).
+- **Docker** y **Docker Compose** instalados.
+- Un dominio apuntando al servidor (o usar `localhost` para pruebas).
+- Certificados TLS (Let's Encrypt) en `/etc/letsencrypt` — opcional en local.
+- El servicio de inferencia **FastAPI (GPU)** corriendo y accesible (por defecto en `10.158.125.189:8000`).
 
-### 1️⃣ Configurar credenciales
+### 1. Configurar credenciales
 
 El archivo **`.env`** en la raíz centraliza todas las credenciales. Revisalo y ajustá los valores antes de levantar nada:
 
@@ -102,9 +102,9 @@ El archivo **`.env`** en la raíz centraliza todas las credenciales. Revisalo y 
 nano .env
 ```
 
-> ⚠️ El `.env` **nunca se sube a Git** (ya está en `.gitignore`). Las contraseñas del repo son de ejemplo: **cambialas en producción**.
+> El `.env` **nunca se sube a Git** (ya está en `.gitignore`). Las contraseñas del repo son de ejemplo: **cambialas en producción**.
 
-### 2️⃣ Levantar la plataforma
+### 2. Levantar la plataforma
 
 ```bash
 cd vm
@@ -113,43 +113,43 @@ docker compose up -d
 
 En el **primer arranque**, `init.sql` crea automáticamente el esquema de la base de datos (tablas, índices y la función `match_face`).
 
-### 3️⃣ Verificar que todo esté arriba
+### 3. Verificar que todo esté arriba
 
 ```bash
 docker compose ps
 ```
 
-### 4️⃣ Acceder
+### 4. Acceder
 
 | Servicio | URL |
 |----------|-----|
-| 🖥️ **App (frontend)** | `https://soagbct2026.mooo.com/` |
-| 🔐 Keycloak (Admin) | `/auth/` |
-| 📊 Grafana | `/grafana/` |
-| 🛠️ Adminer | `/adminer/` |
-| 📦 SeaweedFS | `/storage/` |
+| **App (frontend)** | `https://soagbct2026.mooo.com/` |
+| Keycloak (Admin) | `/auth/` |
+| Grafana | `/grafana/` |
+| Adminer | `/adminer/` |
+| SeaweedFS | `/storage/` |
 
-### 5️⃣ Primeros pasos en la app
+### 5. Primeros pasos en la app
 
 1. **Registrate** desde la pantalla de login (crea tu usuario en Keycloak + tu persona en el padrón). Nacés con rol `viewer`.
 2. **Enrolá tu rostro** y activá el **2FA** → la cuenta se promueve automáticamente a `operator`.
-3. Ya podés **detectar objetos** y **reconocer rostros**. 🎉
+3. Ya podés **detectar objetos** y **reconocer rostros**.
 
 ---
 
-## 👥 Roles y permisos
+## Roles y permisos
 
 | Rol | Puede |
 |-----|-------|
-| 👁️ **viewer** *(por defecto)* | Solo lectura. Subir su propio rostro y activar su 2FA. |
-| ✍️ **operator** | Detección de objetos, alta de personas, muestras faciales. |
-| 👑 **admin** | Todo, incluidas operaciones destructivas (eliminar personas/cuentas). *Se otorga solo desde Keycloak.* |
+| **viewer** *(por defecto)* | Solo lectura. Subir su propio rostro y activar su 2FA. |
+| **operator** | Detección de objetos, alta de personas, muestras faciales. |
+| **admin** | Todo, incluidas operaciones destructivas (eliminar personas/cuentas). *Se otorga solo desde Keycloak.* |
 
-> 🛡️ Doble control: el frontend oculta acciones según el rol **y** Node-RED las valida de verdad en el backend. Keycloak es la única fuente de la verdad sobre los roles.
+> Doble control: el frontend oculta acciones según el rol **y** Node-RED las valida de verdad en el backend. Keycloak es la única fuente de la verdad sobre los roles.
 
 ---
 
-## 🔧 Operación y mantenimiento
+## Operación y mantenimiento
 
 | Tarea | Comando |
 |-------|---------|
@@ -160,7 +160,7 @@ docker compose ps
 | Recargar Nginx (tras tocar `nginx.conf`) | `docker compose exec nginx nginx -s reload` |
 | Frontend | Editar archivos en `frontend/` y **recargar el navegador** (no hay build) |
 
-> ⚠️ **Cuidado con Node-RED:** el editor es dueño de `flows.json`. Un *Deploy* desde una sesión vieja del editor puede pisar ediciones hechas al archivo por fuera.
+> **Cuidado con Node-RED:** el editor es dueño de `flows.json`. Un *Deploy* desde una sesión vieja del editor puede pisar ediciones hechas al archivo por fuera.
 
 ### Volúmenes persistentes
 
@@ -168,37 +168,35 @@ docker compose ps
 
 ---
 
-## 📂 Estructura del repositorio
+## Estructura del repositorio
 
 ```
 trabajo final soa/
-├── .env                  # 🔑 Credenciales centralizadas (NO se sube a Git)
+├── .env                  # Credenciales centralizadas (NO se sube a Git)
 ├── .gitignore
-├── README.md             # 📖 Este archivo
+├── README.md             # Este archivo
 │
-├── vm/                   # 🚀 STACK FINAL (versión desplegada — ATALAYA)
+├── vm/                   # STACK FINAL (versión desplegada — ATALAYA)
 │   ├── docker-compose.yml
-│   ├── arquitectura.md   # 📐 Documentación técnica detallada
-│   ├── init.sql          # 🗄️ Esquema inicial de PostgreSQL
-│   ├── frontend/         # 🎨 SPA Vue 3 (sin build)
-│   ├── nginx/            # 🔀 Config del reverse proxy + certs
-│   ├── nodered_data/     # ⚙️ Flujos y config del backend
-│   ├── telegraf/         # 📡 Config de recolección de métricas
+│   ├── arquitectura.md   # Documentación técnica detallada
+│   ├── init.sql          # Esquema inicial de PostgreSQL
+│   ├── frontend/         # SPA Vue 3 (sin build)
+│   ├── nginx/            # Config del reverse proxy + certs
+│   ├── nodered_data/     # Flujos y config del backend
+│   ├── telegraf/         # Config de recolección de métricas
 │   ├── grafana_provisioning/
-│   ├── modelos/          # 🧠 Modelos YOLO (.pt)
+│   ├── modelos/          # Modelos YOLO (.pt)
 │   └── ...               # volúmenes de datos persistentes
 │
-└── yolo/                 # 🧪 PROTOTIPO ANTERIOR (Mongo/MySQL — legacy)
+└── yolo/                 # PROTOTIPO ANTERIOR (Mongo/MySQL — legacy)
 ```
 
-> 📌 **`vm/` es el stack vigente.** La carpeta `yolo/` es un prototipo previo (MongoDB/MySQL) que se conserva como referencia histórica.
+> **`vm/` es el stack vigente.** La carpeta `yolo/` es un prototipo previo (MongoDB/MySQL) que se conserva como referencia histórica.
 
 ---
 
 <div align="center">
 
 **ATALAYA** — Trabajo Final Integrador SOA · 2026
-
-*Hecho con 🐳 Docker, 👁️ visión por computadora y mucho ☕*
 
 </div>
