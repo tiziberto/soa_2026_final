@@ -1,0 +1,17 @@
+apiVersion: 1
+
+datasources:
+  - name: PostgreSQL_SOA
+    uid: mi_postgres_soa
+    type: postgres
+    access: proxy
+    url: soa_postgres:5432
+    database: soa_db
+    user: soa_admin
+    secureJsonData:
+      password: "SuperSecretPassword2026"
+    jsonData:
+      sslmode: 'disable'
+      postgresVersion: 15
+      database: soa_db
+    editable: false

@@ -1,0 +1,10 @@
+# Variables de entorno y secretos
+.env
+
+# Volúmenes de persistencia locales
+postgres_data/
+nodered_data/
+seaweedfs_data/
+
+# Modelos pesados (evitar subir .pt a Git)
+modelos/	

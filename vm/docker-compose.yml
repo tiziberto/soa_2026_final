@@ -1,0 +1,128 @@
+version: '3.8'
+
+services:
+  nodered:
+    image: nodered/node-red:latest
+    container_name: soa_nodered
+    environment:
+      - PROMETHEUS_COLLECT_DEFAULT_METRICS=true
+      # Para que POST /api/register pueda crear usuarios en Keycloak (Admin API)
+      - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN}
+      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
+    volumes:
+      - ./nodered_data:/data
+      - ./modelos:/modelos
+    networks:
+      - soa-network
+    depends_on:
+      - postgres
+      - seaweedfs
+
+  postgres:
+    image: pgvector/pgvector:pg15
+    container_name: soa_postgres
+    # Reemplazamos 'environment' por 'env_file'
+    env_file:
+      - .env
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - soa-network
+
+  seaweedfs:
+    image: chrislusf/seaweedfs:latest
+    container_name: soa_seaweedfs
+    command: "server -dir=/data -ip=seaweedfs"
+    volumes:
+      - ./seaweedfs_data:/data
+    networks:
+      - soa-network
+  # ==========================================
+  # HERRAMIENTAS DE DESARROLLO (DB ADMIN)
+  # ==========================================
+  adminer:
+    image: adminer:latest
+    container_name: soa_adminer
+    #Se accede por https://soagbct2026.mooo.com/adminer/ 
+    networks:
+      - soa-network
+    depends_on:
+      - postgres
+  # ==========================================
+  # FASE 2: FRONTEND Y SEGURIDAD
+  # ==========================================
+  nginx:
+    image: nginx:alpine
+    container_name: soa_nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - ./frontend:/usr/share/nginx/html  
+    networks:
+      - soa-network
+    depends_on:
+      - nodered
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: soa_keycloak
+    # KC_PROXY_HEADERS permite a Keycloak entender que Nginx está manejando el HTTPS
+    command: start-dev --proxy-headers xforwarded 
+    environment:
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KC_HOSTNAME: https://${DOMAIN_NAME}/auth/
+    networks:
+      - soa-network
+    depends_on:
+      - postgres
+
+  # ==========================================
+  # FASE 2: OBSERVABILIDAD (TIG STACK)
+  # ==========================================
+  influxdb:
+    image: influxdb:1.8-alpine 
+    container_name: soa_influxdb
+    environment:
+      INFLUXDB_DB: ${INFLUXDB_DB}
+    volumes:
+      - ./influxdb_data:/var/lib/influxdb
+    networks:
+      - soa-network
+
+  telegraf:
+    image: telegraf:alpine
+    container_name: soa_telegraf
+    volumes:
+      - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro 
+    networks:
+      - soa-network
+    depends_on:
+      - influxdb
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: soa_grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GF_SECURITY_ADMIN_USER}
+      GF_SECURITY_ADMIN_PASSWORD: ${GF_SECURITY_ADMIN_PASSWORD}
+      # Variables cruciales para que Grafana cargue sus estilos y JS detrás de /grafana/
+      GF_SERVER_DOMAIN: ${DOMAIN_NAME}
+      GF_SERVER_ROOT_URL: https://${DOMAIN_NAME}/grafana/
+      GF_SERVER_SERVE_FROM_SUB_PATH: "true"
+    volumes:
+      - ./grafana_data:/var/lib/grafana
+      - ./grafana_provisioning:/etc/grafana/provisioning
+    networks:
+      - soa-network
+    depends_on:
+      - influxdb
+
+networks:
+  soa-network:
+    driver: bridge
